@@ -17,6 +17,7 @@
 #include "locomotive.h"
 #include "ctrain_handler.h"
 #include "synchrointerface.h"
+#include <QVector>
 
 /**
  * @brief La classe Synchro implémente l'interface SynchroInterface qui
@@ -24,14 +25,25 @@
  */
 class Synchro final : public SynchroInterface
 {
+
+protected:
+
+    PcoSemaphore mutex{1};
+    PcoSemaphore waiting{0};
+
+    QMap<unsigned int,unsigned int> startSection;
+    QMap<unsigned int,unsigned int> endSection;
+
 public:
 
     /**
      * @brief Synchro Constructeur de la classe qui représente la section partagée.
      * Initialisez vos éventuels attributs ici, sémaphores etc.
      */
-    Synchro() {
-        // TODO
+    Synchro(unsigned int startSection1,unsigned int endSection1,unsigned int startSection2,unsigned int endSection2) {
+
+
+
     }
 
     /**
@@ -78,6 +90,7 @@ public:
     }
 
     /* A vous d'ajouter ce qu'il vous faut */
+
 
 private:
     // Méthodes privées ...
