@@ -53,8 +53,8 @@ int cmain()
     diriger_aiguillage(1,  TOUT_DROIT, 0);
     diriger_aiguillage(2,  DEVIE     , 0);
     diriger_aiguillage(3,  DEVIE     , 0);
-    diriger_aiguillage(4,  TOUT_DROIT, 0);
-    diriger_aiguillage(5,  TOUT_DROIT, 0);
+    diriger_aiguillage(4,  DEVIE, 0);
+    diriger_aiguillage(5,  DEVIE, 0);
     diriger_aiguillage(6,  DEVIE, 0);
     diriger_aiguillage(7,  TOUT_DROIT, 0);
     diriger_aiguillage(8,  DEVIE     , 0);
@@ -66,7 +66,7 @@ int cmain()
     diriger_aiguillage(14, DEVIE     , 0);
     diriger_aiguillage(15, DEVIE     , 0);
     diriger_aiguillage(16, TOUT_DROIT, 0);
-    diriger_aiguillage(17, TOUT_DROIT, 0);
+    diriger_aiguillage(17, DEVIE, 0);
     diriger_aiguillage(18, DEVIE, 0);
     diriger_aiguillage(19, TOUT_DROIT, 0);
     diriger_aiguillage(20, DEVIE     , 0);

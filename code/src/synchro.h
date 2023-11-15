@@ -31,8 +31,6 @@ protected:
     PcoSemaphore mutex{1};
     PcoSemaphore waiting{0};
 
-    QMap<unsigned int,unsigned int> startSection;
-    QMap<unsigned int,unsigned int> endSection;
 
 public:
 
@@ -40,7 +38,7 @@ public:
      * @brief Synchro Constructeur de la classe qui représente la section partagée.
      * Initialisez vos éventuels attributs ici, sémaphores etc.
      */
-    Synchro(unsigned int startSection1,unsigned int endSection1,unsigned int startSection2,unsigned int endSection2) {
+    Synchro() {
 
 
 

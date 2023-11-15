@@ -59,6 +59,13 @@ protected:
      *
      * Par exemple la priorité ou le parcours
      */
+
+    bool captorActivation{false};
+
+    void parcours1();
+
+    //void parcours2();
+
 };
 
 #endif // LOCOMOTIVEBEHAVIOR_H
