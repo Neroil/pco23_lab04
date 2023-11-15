@@ -23,6 +23,7 @@ void LocomotiveBehavior::run()
     //sharedSection->leave(loco);
     //sharedSection->stopAtStation(loco);
 
+
     while(true) {
         // On attend qu'une locomotive arrive sur le contact 1.
         // Pertinent de faire ça dans les deux threads? Pas sûr...
