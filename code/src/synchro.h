@@ -36,7 +36,7 @@ protected:
     bool isInSharedSection{false};
     int nbWaiting{0};
 
-    QVector<int> gares;
+    std::vector<int> gares;
 
     int lastArrivedNum;
     int nbWaitingAtStation;
@@ -48,9 +48,9 @@ public:
      * @brief Synchro Constructeur de la classe qui représente la section partagée.
      * Initialisez vos éventuels attributs ici, sémaphores etc.
      */
-    Synchro(QVector<int> &gares) {
+    Synchro(std::vector<int> &gares) {
 
-        std::copy(gares.first(),gares.last(),this->gares);
+        std::copy(gares.begin(),gares.end(),std::back_inserter(this->gares));
 
     }
 
@@ -116,7 +116,7 @@ public:
         //TODO
         loco.arreter();
         mutex.acquire();
-        if(nbWaitingAtStation == gares.length() - 1){
+        if(nbWaitingAtStation == (int)gares.size() - 1){
             lastArrivedNum = loco.numero();
             releaseStation();
             mutex.release();
