@@ -13,6 +13,7 @@
 #include <QDebug>
 
 #include <pcosynchro/pcosemaphore.h>
+#include <pcosynchro/pcothread.h>
 
 #include "locomotive.h"
 #include "ctrain_handler.h"
@@ -29,7 +30,16 @@ class Synchro final : public SynchroInterface
 protected:
 
     PcoSemaphore mutex{1};
-    PcoSemaphore waiting{0};
+    PcoSemaphore waitingSection{0};
+    PcoSemaphore waitingStation{0};
+    PcoSemaphore fifo{1};
+    bool isInSharedSection{false};
+    int nbWaiting{0};
+
+    QVector<int> gares;
+
+    int lastArrivedNum;
+    int nbWaitingAtStation;
 
 
 public:
@@ -38,9 +48,9 @@ public:
      * @brief Synchro Constructeur de la classe qui représente la section partagée.
      * Initialisez vos éventuels attributs ici, sémaphores etc.
      */
-    Synchro() {
+    Synchro(QVector<int> &gares) {
 
-
+        std::copy(gares.first(),gares.last(),this->gares);
 
     }
 
@@ -54,6 +64,19 @@ public:
     void access(Locomotive &loco) override {
         // TODO
 
+        mutex.acquire();
+        while(isInSharedSection || (lastArrivedNum == loco.numero() && lastArrivedNum != -1)){
+            ++nbWaiting;
+            mutex.release();
+            loco.arreter();
+            waitingSection.acquire();
+            mutex.acquire();
+            --nbWaiting;
+        }
+        if(lastArrivedNum == loco.numero()) lastArrivedNum = -1; //Inidicate to the waiting locomotives that they can now go
+        loco.demarrer();
+        isInSharedSection = true;
+        mutex.release();
         // Exemple de message dans la console globale
         afficher_message(qPrintable(QString("The engine no. %1 accesses the shared section.").arg(loco.numero())));
     }
@@ -68,6 +91,15 @@ public:
     void leave(Locomotive& loco) override {
         // TODO
 
+        mutex.acquire();
+        isInSharedSection = false;
+
+        if(nbWaiting > 0){
+            waitingSection.release();
+        }
+
+        mutex.release();
+
         // Exemple de message dans la console globale
         afficher_message(qPrintable(QString("The engine no. %1 leaves the shared section.").arg(loco.numero())));
     }
@@ -81,17 +113,41 @@ public:
      * @param loco La locomotive qui doit attendre à la gare
      */
     void stopAtStation(Locomotive& loco) override {
-        // TODO
+        //TODO
+        loco.arreter();
+        mutex.acquire();
+        if(nbWaitingAtStation == gares.length() - 1){
+            lastArrivedNum = loco.numero();
+            releaseStation();
+            mutex.release();
+        } else {
+            ++nbWaitingAtStation;
+            mutex.release();
+            waitingStation.acquire();
+        }
 
+        PcoThread::usleep(5);
+        loco.demarrer();
         // Exemple de message dans la console globale
         afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
     }
+
+
 
     /* A vous d'ajouter ce qu'il vous faut */
 
 
 private:
     // Méthodes privées ...
+
+    void releaseStation() {
+
+        while(nbWaitingAtStation){
+            waitingStation.release();
+            --nbWaitingAtStation;
+        }
+
+    }
     // Attribut privés ...
 };
 
