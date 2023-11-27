@@ -54,16 +54,6 @@ public:
 
     }
 
-    /**
-     * @brief Synchro Constructeur de la classe qui représente la section partagée.
-     * Initialisez vos éventuels attributs ici, sémaphores etc.
-     */
-
-    Synchro() {
-
-        //std::copy(gares.begin(),gares.end(),std::back_inserter(this->gares));
-
-    }
 
     /**
      * @brief access Méthode à appeler pour accéder à la section partagée
@@ -73,10 +63,9 @@ public:
      * @param loco La locomotive qui essaie accéder à la section partagée
      */
     void access(Locomotive &loco) override {
-        // TODO
 
         mutex.acquire();
-        if(isInSharedSection || loco.numero() != lastArrivedNum){
+        if(nbWaiting || isInSharedSection || loco.numero() != lastArrivedNum){
             ++nbWaiting;
             mutex.release();
             loco.arreter();
@@ -84,7 +73,7 @@ public:
             mutex.acquire();
             --nbWaiting;
         }
-        //if(lastArrivedNum == loco.numero()) lastArrivedNum = -1; //Inidicate to the waiting locomotives that they can now go
+
         loco.demarrer();
         isInSharedSection = true;
         mutex.release();
