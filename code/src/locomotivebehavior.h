@@ -19,13 +19,29 @@
  */
 class LocomotiveBehavior : public Launchable
 {
+
+private:
+
+    int gare,
+        debutSharedSection,
+        finSharedSection,
+        numSwitchSharedSection,
+        deviation;
+
 public:
+
     /*!
      * \brief locomotiveBehavior Constructeur de la classe
      * \param loco la locomotive dont on représente le comportement
      */
-    LocomotiveBehavior(Locomotive& loco, std::shared_ptr<SynchroInterface> sharedSection /*, autres paramètres éventuels */) : loco(loco), sharedSection(sharedSection) {
-        // Eventuel code supplémentaire du constructeur
+    LocomotiveBehavior(Locomotive& loco, std::shared_ptr<SynchroInterface> sharedSection,int gare,
+                       int debutSharedSection,int finSharedSection,int numSwitchSharedSection,int deviation) : loco(loco), sharedSection(sharedSection) {
+
+        this->gare = gare;
+        this->debutSharedSection = debutSharedSection;
+        this->finSharedSection = finSharedSection;
+        this->numSwitchSharedSection = numSwitchSharedSection;
+        this->deviation = deviation;
     }
 
 protected:
@@ -60,11 +76,6 @@ protected:
      * Par exemple la priorité ou le parcours
      */
 
-    bool captorActivation{false};
-
-    void parcours1();
-
-    //void parcours2();
 
 };
 

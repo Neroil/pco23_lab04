@@ -17,6 +17,8 @@
 // Vous pouvez changer les vitesses initiales, ou utiliser la fonction loco.fixerVitesse(vitesse);
 // Laissez les numéros des locos à 0 et 1 pour ce laboratoire
 
+static int nbLoco = 2;
+
 // Locomotive A
 static Locomotive locoA(7 /* Numéro (pour commande trains sur maquette réelle) */, 10 /* Vitesse */);
 // Locomotive B
@@ -88,6 +90,11 @@ int cmain()
     // Exemple de position de départ
     locoB.fixerPosition(28, 29);
 
+    /********************************
+     * Ajout des loco dans un vecteur *
+     ********************************/
+
+
     /***********
      * Message *
      **********/
@@ -100,12 +107,12 @@ int cmain()
      ********************/
 
     // Création de la section partagée
-    std::shared_ptr<SynchroInterface> sharedSection = std::make_shared<Synchro>();
+    std::shared_ptr<SynchroInterface> sharedSection = std::make_shared<Synchro>(nbLoco);
 
     // Création du thread pour la loco 0
-    std::unique_ptr<Launchable> locoBehaveA = std::make_unique<LocomotiveBehavior>(locoA, sharedSection /*, autres paramètres ...*/);
+    std::unique_ptr<Launchable> locoBehaveA = std::make_unique<LocomotiveBehavior>(locoA, sharedSection,16,8,33,20,DEVIE);
     // Création du thread pour la loco 1
-    std::unique_ptr<Launchable> locoBehaveB = std::make_unique<LocomotiveBehavior>(locoB, sharedSection /*, autres paramètres ...*/);
+    std::unique_ptr<Launchable> locoBehaveB = std::make_unique<LocomotiveBehavior>(locoB, sharedSection,19,11,33,20,TOUT_DROIT);
 
     // Lanchement des threads
     afficher_message(qPrintable(QString("Lancement thread loco A (numéro %1)").arg(locoA.numero())));

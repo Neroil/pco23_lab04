@@ -27,16 +27,15 @@ void LocomotiveBehavior::run()
 
 
     while(true) {
-        // On attend qu'une locomotive arrive sur le contact 1.
-        // Pertinent de faire ça dans les deux threads? Pas sûr...
 
-        if(loco.numero()==42) parcours1();
+        attendre_contact(gare);
+        sharedSection->stopAtStation(loco);
+        attendre_contact(debutSharedSection);
+        sharedSection->access(loco);
+        attendre_contact(finSharedSection);
+        diriger_aiguillage(numSwitchSharedSection, deviation, 0);
+        sharedSection->leave(loco);
 
-
-
-
-        //attendre_contact(1);
-        //loco.afficherMessage("J'ai atteint le contact 1");
     }
 }
 
@@ -52,17 +51,3 @@ void LocomotiveBehavior::printCompletionMessage()
     loco.afficherMessage("J'ai terminé");
 }
 
-void LocomotiveBehavior::parcours1(){
-
-    attendre_contact(34);
-    if(!captorActivation){
-        diriger_aiguillage(20, TOUT_DROIT, 0);
-        captorActivation = true;}
-    else{
-        captorActivation = false;
-    }
-
-    attendre_contact(28);
-    if(captorActivation) diriger_aiguillage(20, DEVIE, 0);
-    else diriger_aiguillage(20, TOUT_DROIT, 0);
-}

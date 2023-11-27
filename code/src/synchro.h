@@ -36,7 +36,7 @@ protected:
     bool isInSharedSection{false};
     int nbWaiting{0};
 
-    std::vector<int> gares;
+    int nbLoco;
 
     int lastArrivedNum;
     int nbWaitingAtStation;
@@ -48,9 +48,20 @@ public:
      * @brief Synchro Constructeur de la classe qui représente la section partagée.
      * Initialisez vos éventuels attributs ici, sémaphores etc.
      */
-    Synchro(std::vector<int> &gares) {
+    Synchro(int nbLoco) {
 
-        std::copy(gares.begin(),gares.end(),std::back_inserter(this->gares));
+        this->nbLoco = nbLoco;
+
+    }
+
+    /**
+     * @brief Synchro Constructeur de la classe qui représente la section partagée.
+     * Initialisez vos éventuels attributs ici, sémaphores etc.
+     */
+
+    Synchro() {
+
+        //std::copy(gares.begin(),gares.end(),std::back_inserter(this->gares));
 
     }
 
@@ -65,7 +76,7 @@ public:
         // TODO
 
         mutex.acquire();
-        while(isInSharedSection || (lastArrivedNum == loco.numero() && lastArrivedNum != -1)){
+        if(isInSharedSection || loco.numero() != lastArrivedNum){
             ++nbWaiting;
             mutex.release();
             loco.arreter();
@@ -73,7 +84,7 @@ public:
             mutex.acquire();
             --nbWaiting;
         }
-        if(lastArrivedNum == loco.numero()) lastArrivedNum = -1; //Inidicate to the waiting locomotives that they can now go
+        //if(lastArrivedNum == loco.numero()) lastArrivedNum = -1; //Inidicate to the waiting locomotives that they can now go
         loco.demarrer();
         isInSharedSection = true;
         mutex.release();
@@ -89,7 +100,6 @@ public:
      * @param loco La locomotive qui quitte la section partagée
      */
     void leave(Locomotive& loco) override {
-        // TODO
 
         mutex.acquire();
         isInSharedSection = false;
@@ -113,10 +123,10 @@ public:
      * @param loco La locomotive qui doit attendre à la gare
      */
     void stopAtStation(Locomotive& loco) override {
-        //TODO
+
         loco.arreter();
         mutex.acquire();
-        if(nbWaitingAtStation == (int)gares.size() - 1){
+        if(nbWaitingAtStation == nbLoco - 1){
             lastArrivedNum = loco.numero();
             releaseStation();
             mutex.release();
@@ -126,7 +136,7 @@ public:
             waitingStation.acquire();
         }
 
-        PcoThread::usleep(5);
+        PcoThread::usleep(5000000); //On attend 5 secondes (j'ai pas trouvé d'autres fonctions mdr)
         loco.demarrer();
         // Exemple de message dans la console globale
         afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
