@@ -65,15 +65,16 @@ public:
     void access(Locomotive &loco) override {
 
         mutex.acquire();
-        if(nbWaiting || isInSharedSection || loco.numero() != lastArrivedNum){
+        if(isInSharedSection || loco.numero() != lastArrivedNum){
             ++nbWaiting;
             mutex.release();
             loco.arreter();
+            afficher_message_loco(loco.numero(),"5 minutes de retard : L'attente d'un autre train en est la cause");
             waitingSection.acquire();
             mutex.acquire();
             --nbWaiting;
         }
-
+        afficher_message_loco(loco.numero(),"Je m'engouffre dans cette section partagée !! :O");
         loco.demarrer();
         isInSharedSection = true;
         mutex.release();
@@ -94,6 +95,7 @@ public:
         isInSharedSection = false;
 
         if(nbWaiting > 0){
+            afficher_message_loco(loco.numero(),"C'est bon poto tu peux passer ;^)");
             waitingSection.release();
         }
 
@@ -115,25 +117,27 @@ public:
 
         loco.arreter();
         mutex.acquire();
-        if(nbWaitingAtStation == nbLoco - 1){
+        if(nbWaitingAtStation == nbLoco - 1){ //On est la dernière locomotive à être arrivée
             lastArrivedNum = loco.numero();
             releaseStation();
             mutex.release();
+            afficher_message_loco(loco.numero(),"Je suis arrivée en dernier à la station et la priorité est à MOI :^)");
+            afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
         } else {
             ++nbWaitingAtStation;
             mutex.release();
+            afficher_message_loco(loco.numero(),"Je suis arrivée à la station mais MINCE je dois attendre maintenant :^O");
+            afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
             waitingStation.acquire();
         }
 
         PcoThread::usleep(5000000); //On attend 5 secondes (j'ai pas trouvé d'autres fonctions mdr)
+        afficher_message_loco(loco.numero(),"DEPAAAART");
+        afficher_message(qPrintable(QString("The engine no. %1 leaves the station.").arg(loco.numero())));
         loco.demarrer();
         // Exemple de message dans la console globale
-        afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
+
     }
-
-
-
-    /* A vous d'ajouter ce qu'il vous faut */
 
 
 private:
