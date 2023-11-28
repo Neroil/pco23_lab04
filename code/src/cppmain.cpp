@@ -28,7 +28,8 @@ static Locomotive locoB(42 /* Numéro (pour commande trains sur maquette réelle
 void emergency_stop()
 {
     // TODO
-
+    locoA.fixerVitesse(0);
+    locoB.fixerVitesse(0);
     afficher_message("\nSTOP!");
 }
 
@@ -89,12 +90,6 @@ int cmain()
     // Loco 1
     // Exemple de position de départ
     locoB.fixerPosition(28, 29);
-
-    /********************************
-     * Ajout des loco dans un vecteur *
-     ********************************/
-
-
     /***********
      * Message *
      **********/

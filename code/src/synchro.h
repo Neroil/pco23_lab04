@@ -63,9 +63,9 @@ public:
      * @param loco La locomotive qui essaie accéder à la section partagée
      */
     void access(Locomotive &loco) override {
-
+        if(loco.numero() != lastArrivedNum) fifo.acquire();
         mutex.acquire();
-        if(isInSharedSection || loco.numero() != lastArrivedNum){
+        if(isInSharedSection || loco.numero() != lastArrivedNum ){
             ++nbWaiting;
             mutex.release();
             loco.arreter();
@@ -78,6 +78,7 @@ public:
         loco.demarrer();
         isInSharedSection = true;
         mutex.release();
+        if(loco.numero() != lastArrivedNum) fifo.release();
         // Exemple de message dans la console globale
         afficher_message(qPrintable(QString("The engine no. %1 accesses the shared section.").arg(loco.numero())));
     }
