@@ -10,13 +10,19 @@ Ce logiciel simule une maquette de petits trains. Le but est d'avoir un système
 Au final, on veut que deux trains qui se partagent une voie ferrée puissent se croiser sans
 se percuter.
 
+Gare et section partagée:
 
+![Gare et SectionP](Gare_SectionP.png "Gare(Vert) et Section partagée (Magenta)")
+
+Parcours:
+
+![Parcours des 2 locos](Parcours2loco.png "Parcours des 2 locomotives")
 
 ## Choix d'implémentation
 
 ### cppmain.cpp/emergency_stop()
 
-Pour l'emergency stop nous avons décidé de juste fixer la vitesse des locomitves à 0, ainsi elle ne pourront plus redémarrer et seront bloquées à l'endroit où l'ES s'est activé. 
+Pour l'emergency stop nous avons décidé de juste fixer la vitesse des locomotives à 0, ainsi elle ne pourront plus redémarrer et seront bloquées à l'endroit où l'ES s'est activé.
 
 Nous voulions, au début, arrêter également les threads grâce à ```requestStop()``` mais comme il nous est impossible d'accéder à ceux-ci depuis la fonction ```emergency_stop()``` (car ils sont initialisés dans une autre fonctions ```cmain()```) nous en sommes restés à simplement arrêter les locomotives (nous ne savions pas si nous pouvions modifier la fonction ```cmain()``` comme nous le souhaitions). Si nous devions arrêter les threads nous aurions donc appelés ```requestStop()``` sur chacun d'eux et dans *locomotiveBehaviour.cpp* vérifier dans la boucle while que le flag avait été levé. Ce qui veut dire que actuellement la boucle while du locomotiveBehaviour ne peut pas s'arrêter.
 
@@ -76,7 +82,7 @@ Elle prend paramètre la locomotive qui doit s'arrêter à la gare.
 La première chose que fait la fonction est d'arrêter la locomotive concernée puis de lock ```mutex``` afin de ne faire qu'une vérification pour chaque locomotive à la fois. Elle vérifie ensuite si la locomotive est la dernière que l'on attend à la gare grâce à ```nbLoco```:
 
 - Si non la locomotive incrémente ```nbWaitingAtStation``` et unlock ```mutex``` afin de se faire bloquer par ```waitingStation``` qui fait office de queue.
-- Si oui le numéro de la locomotive va être mis dans ```lastArrivendNum``` afin de le réutiliser dans la section partagée et va faire appel à ```releaseStation()```. Elle fini par unlock ```mutex```.
+- Si oui le numéro de la locomotive va être mis dans ```lastArrivedNum``` afin de le réutiliser dans la section partagée et va faire appel à ```releaseStation()```. Elle fini par unlock ```mutex```.
 
 Ensuite toutes les locomotives attendent 5 secondes à la gare afin que les voyageurs puisse faire le transit et redémarre en même temps.
 
@@ -111,7 +117,6 @@ La locomotive lock ```mutex``` afin de mettre ```isInSharedSection``` à false e
 
 On indique également la libération de loco et la sortie de de section partagée par des messages.
 
-
 ## Tests effectués
 
 Nous avons vérifié grâce au messages envoyés dans la console générales et des locomotives et visuellement que:
@@ -119,10 +124,7 @@ Nous avons vérifié grâce au messages envoyés dans la console générales et 
 1. L'emergency_stop empêche bien toutes les locomotives de redémarrer ou de bouger après son appui (Visuel).
 2. Il n'y a pas de deadlock qui empêche les locomotive de rentrer/sortir de la section partagée et de la section (Visuel + messages).
 3. Si une locomotive arrive à la section partagée au même moment qu'elle se libère qu'elle ne fasse que de ralentir brièvement sans s'arrêter(Visuel + messages).
-4. Que la locomotive qui arrive en dernier à la station soit bien celle qui a la priorité à la section partagée (Visuel).
-
-
-
-
-
-## Conclusion
+4. La locomotive qui arrive en dernier à la station soit bien celle qui a la priorité à la section partagée (Visuel).
+5. Une seule locomotive peut avoir accès à la section partagée à la fois (Visuel + messages).
+6. Les deux locomotives s'attendent à la gare et redémarre 5 secondes après l'arrivée de la dernière (Visuel + messages).
+7. Il n'y a pas de cas où une locomotive s'arrête/démarre brusquement (Visuel).
